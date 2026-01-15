@@ -209,3 +209,6 @@ CREATE POLICY "Admins can delete client requests" ON client_requests
       AND is_active = true
     )
   );
+
+  
+  --upadated

@@ -10,7 +10,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import UserDashboard from "./pages/UserDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
+import SimpleAdminDashboardNew from "./pages/SimpleAdminDashboardNew";
 import Projects from "./pages/Projects";
 import Team from "./pages/Team";
 import Guide from "./pages/Guide";
@@ -36,7 +36,7 @@ const App = () => (
                 <Route path="/how-to-use" element={<Guide />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/user-dashboard" element={<UserDashboard />} />
-                <Route path="/admin-dashboard" element={<AdminDashboard />} />
+                <Route path="/admin-dashboard" element={<SimpleAdminDashboardNew />} />
               </Route>
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />

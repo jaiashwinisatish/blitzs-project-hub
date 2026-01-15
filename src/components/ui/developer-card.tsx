@@ -15,7 +15,7 @@ interface DeveloperCardProps {
   linkedinUrl?: string;
   twitterUrl?: string;
   portfolioUrl?: string;
-  experienceYears: number;
+  experienceYears?: number;
   index?: number;
 }
 
@@ -63,9 +63,11 @@ export const DeveloperCard = ({
             {/* Info */}
             <h3 className="font-semibold text-lg mb-1">{name}</h3>
             <p className="text-primary text-sm mb-2">{title}</p>
-            <Badge variant="secondary" className="mb-3">
-              {experienceYears}+ years experience
-            </Badge>
+            {experienceYears && experienceYears > 0 && (
+              <Badge variant="secondary" className="mb-3">
+                {experienceYears}+ years experience
+              </Badge>
+            )}
 
             {bio && (
               <p className="text-muted-foreground text-sm mb-4 line-clamp-2">

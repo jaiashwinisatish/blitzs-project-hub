@@ -17,7 +17,7 @@ const Projects = () => {
   const [filters, setFilters] = useState({
     category: 'all',
     search: '',
-    sortBy: 'createdAt',
+    sortBy: 'created_at',
     isFree: 'all'
   });
   const [pagination, setPagination] = useState({
@@ -92,7 +92,7 @@ const Projects = () => {
   ];
 
   const sortOptions = [
-    { value: 'createdAt', label: 'Newest First' },
+    { value: 'created_at', label: 'Newest First' },
     { value: 'price', label: 'Price: Low to High' },
     { value: '-price', label: 'Price: High to Low' },
     { value: 'purchases', label: 'Most Popular' },
@@ -208,7 +208,7 @@ const Projects = () => {
                     <CardHeader className="pb-3">
                       <div className="aspect-video bg-muted rounded-lg mb-4 overflow-hidden">
                         <img
-                          src={project.images[0] || 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400'}
+                          src={project.images && project.images.length > 0 ? project.images[0] : 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400'}
                           alt={project.title}
                           className="w-full h-full object-cover"
                         />

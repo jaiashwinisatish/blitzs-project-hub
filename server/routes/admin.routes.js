@@ -8,7 +8,9 @@ import {
   getAllClientRequests,
   updateRequestStatus,
   getAllDevelopers,
-  addDeveloper
+  addDeveloper,
+  updateDeveloper,
+  deleteDeveloper
 } from '../controllers/admin.controller.js';
 import { authenticate, authorize } from '../middleware/auth.middleware.js';
 
@@ -31,6 +33,8 @@ router.get('/projects', getAllProjectsAdmin);
 // Developer management
 router.get('/developers', getAllDevelopers);
 router.post('/developers', addDeveloper);
+router.put('/developers/:id', updateDeveloper);
+router.delete('/developers/:id', deleteDeveloper);
 
 // Client request management
 router.get('/requests', getAllClientRequests);

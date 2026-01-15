@@ -7,7 +7,7 @@ import { supabase } from './config/supabase.js';
 
 // Import routes
 import authRoutes from './routes/auth.routes.js';
-import projectRoutes from './routes/project.routes.js';
+import simpleProjectRoutes from './routes/simple-project.routes.js';
 import orderRoutes from './routes/order.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import clientRoutes from './routes/client.routes.js';
@@ -49,7 +49,7 @@ app.get('/api/health', (req, res) => {
 
 // API routes
 app.use('/api/auth', authRoutes);
-app.use('/api/projects', projectRoutes);
+app.use('/api/projects', simpleProjectRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/clients', clientRoutes);

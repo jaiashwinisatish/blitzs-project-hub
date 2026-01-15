@@ -6,28 +6,49 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 
 interface ProjectCardProps {
+  _id: string;
   id: string;
   slug: string;
   title: string;
   shortDescription: string;
+  description: string;
   category: string;
   price: number;
+  isFree: boolean;
   thumbnailUrl?: string;
+  images: string[];
+  demoLink: string;
+  githubLink?: string;
   techStack: string[];
+  features: string[];
+  rating: number;
+  purchases: number;
+  downloads: number;
   index?: number;
 }
 
 export const ProjectCard = ({
-  slug,
+  _id,
+  slug = _id,
   title,
   shortDescription,
+  description,
   category,
   price,
+  isFree,
   thumbnailUrl,
-  techStack,
+  images = [],
+  demoLink,
+  githubLink,
+  techStack = [],
+  features = [],
+  rating = 0,
+  purchases = 0,
+  downloads = 0,
   index = 0,
 }: ProjectCardProps) => {
   const CategoryIcon = category === 'mobile' ? Smartphone : Globe;
+  const imageUrl = thumbnailUrl || (images.length > 0 ? images[0] : null);
 
   return (
     <motion.div
@@ -39,9 +60,9 @@ export const ProjectCard = ({
       <Card className="group h-full overflow-hidden border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5">
         <CardHeader className="p-0">
           <div className="relative aspect-video overflow-hidden bg-muted">
-            {thumbnailUrl ? (
+            {imageUrl ? (
               <img
-                src={thumbnailUrl}
+                src={imageUrl}
                 alt={title}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
@@ -58,7 +79,7 @@ export const ProjectCard = ({
             </div>
             <div className="absolute top-3 right-3">
               <Badge className="bg-blitz-gradient text-primary-foreground">
-                ${price.toFixed(0)}
+                {isFree ? 'Free' : `$${price.toFixed(0)}`}
               </Badge>
             </div>
           </div>
@@ -68,7 +89,7 @@ export const ProjectCard = ({
             {title}
           </h3>
           <p className="text-muted-foreground text-sm line-clamp-2 mb-3">
-            {shortDescription}
+            {shortDescription || description}
           </p>
           <div className="flex flex-wrap gap-1.5">
             {techStack.slice(0, 4).map((tech) => (

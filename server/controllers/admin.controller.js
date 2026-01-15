@@ -2,7 +2,7 @@ import User from '../models/User.js';
 import Project from '../models/Project.js';
 import Order from '../models/Order.js';
 import ClientRequest from '../models/ClientRequest.js';
-import Developer from '../models/Developer.js';
+import { supabaseAdmin } from '../config/supabase.js';
 
 export const getDashboardStats = async (req, res) => {
   try {
@@ -317,12 +317,62 @@ export const updateRequestStatus = async (req, res) => {
 
 export const addDeveloper = async (req, res) => {
   try {
-    const developer = await Developer.create(req.body);
+    const {
+      name,
+      email,
+      bio,
+      avatar,
+      skills,
+      experience,
+      github,
+      linkedin,
+      portfolio
+    } = req.body;
+
+    // Validation
+    if (!name || !email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Name and email are required'
+      });
+    }
+
+    // Parse skills if it's a string
+    const skillsArray = Array.isArray(skills) ? skills : 
+                      typeof skills === 'string' ? skills.split(',').map(s => s.trim()).filter(s => s) : 
+                      [];
+
+    const { data, error } = await supabaseAdmin
+      .from('developers')
+      .insert([{
+        name,
+        email,
+        bio: bio || '',
+        avatar: avatar || '',
+        skills: skillsArray,
+        experience: experience || 'intermediate',
+        github: github || '',
+        linkedin: linkedin || '',
+        portfolio: portfolio || '',
+        is_active: true,
+        rating: 0,
+        total_projects: 0
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Add developer error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to add developer: ' + error.message
+      });
+    }
 
     res.status(201).json({
       success: true,
       message: 'Developer added successfully',
-      data: { developer }
+      data: { developer: data }
     });
   } catch (error) {
     console.error('Add developer error:', error);
@@ -335,18 +385,104 @@ export const addDeveloper = async (req, res) => {
 
 export const getAllDevelopers = async (req, res) => {
   try {
-    const developers = await Developer.find()
-      .sort({ createdAt: -1 });
+    const { data: developers, error } = await supabaseAdmin
+      .from('developers')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Get all developers error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to fetch developers'
+      });
+    }
 
     res.status(200).json({
       success: true,
-      data: { developers }
+      data: { developers: developers || [] }
     });
   } catch (error) {
     console.error('Get all developers error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error fetching developers'
+    });
+  }
+};
+
+export const updateDeveloper = async (req, res) => {
+  try {
+    const { developerId } = req.params;
+    const updateData = req.body;
+
+    // Parse skills if it's a string
+    if (updateData.skills && typeof updateData.skills === 'string') {
+      updateData.skills = updateData.skills.split(',').map(s => s.trim()).filter(s => s);
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('developers')
+      .update(updateData)
+      .eq('id', developerId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Update developer error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to update developer: ' + error.message
+      });
+    }
+
+    if (!data) {
+      return res.status(404).json({
+        success: false,
+        message: 'Developer not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Developer updated successfully',
+      data: { developer: data }
+    });
+  } catch (error) {
+    console.error('Update developer error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error updating developer'
+    });
+  }
+};
+
+export const deleteDeveloper = async (req, res) => {
+  try {
+    const { developerId } = req.params;
+
+    const { error } = await supabaseAdmin
+      .from('developers')
+      .delete()
+      .eq('id', developerId);
+
+    if (error) {
+      console.error('Delete developer error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to delete developer: ' + error.message
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Developer deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete developer error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error deleting developer'
     });
   }
 };

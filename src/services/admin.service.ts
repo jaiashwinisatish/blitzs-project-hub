@@ -97,6 +97,16 @@ export const adminService = {
     return response.data;
   },
 
+  async updateDeveloper(developerId: string, data: any) {
+    const response = await api.put(`/admin/developers/${developerId}`, data);
+    return response.data;
+  },
+
+  async deleteDeveloper(developerId: string) {
+    const response = await api.delete(`/admin/developers/${developerId}`);
+    return response.data;
+  },
+
   async getAllDevelopers() {
     const response = await api.get('/admin/developers');
     return response.data;

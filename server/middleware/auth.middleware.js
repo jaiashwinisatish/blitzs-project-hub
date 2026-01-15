@@ -36,17 +36,10 @@ export const authenticate = async (req, res, next) => {
       .eq('id', user.id)
       .single();
 
-    if (error || !userData) {
+    if (!userData.role) {
       return res.status(401).json({ 
         success: false, 
         message: 'Invalid token. User not found.' 
-      });
-    }
-
-    if (!userData.is_active) {
-      return res.status(401).json({ 
-        success: false, 
-        message: 'Account is deactivated.' 
       });
     }
 
@@ -102,7 +95,7 @@ export const optionalAuth = async (req, res, next) => {
           .eq('id', user.id)
           .single();
 
-        if (!error && userData && userData.is_active) {
+        if (!error && userData && userData.role) {
           req.user = userData;
         }
       } catch (error) {

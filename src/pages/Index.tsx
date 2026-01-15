@@ -7,35 +7,32 @@ import { SectionHeader } from '@/components/ui/section-header';
 import { ProjectCard } from '@/components/ui/project-card';
 import { DeveloperCard } from '@/components/ui/developer-card';
 import { projectService } from '@/services/project.service';
-
-const teamMembers = [
-  { name: 'Alex Chen', title: 'Lead Full-Stack Developer', specializations: ['React', 'Node.js', 'Cloud'], skills: ['TypeScript', 'PostgreSQL', 'AWS', 'Docker', 'GraphQL'], experienceYears: 8, githubUrl: '#', linkedinUrl: '#' },
-  { name: 'Sarah Johnson', title: 'Mobile Developer', specializations: ['React Native', 'iOS', 'Android'], skills: ['Swift', 'Kotlin', 'Firebase', 'Redux'], experienceYears: 6, githubUrl: '#', linkedinUrl: '#' },
-  { name: 'Michael Park', title: 'Backend Engineer', specializations: ['APIs', 'Databases', 'DevOps'], skills: ['Python', 'Go', 'PostgreSQL', 'Kubernetes'], experienceYears: 7, githubUrl: '#', linkedinUrl: '#' },
-];
-
-const services = [
-  { icon: Code2, title: 'Ready-made Projects', description: 'Production-ready applications you can deploy instantly' },
-  { icon: Rocket, title: 'Web Application Development', description: 'Scalable, secure, modern web apps for businesses' },
-  { icon: Smartphone, title: 'Mobile App Development', description: 'Cross-platform iOS & Android applications' },
-  { icon: Users, title: 'Custom Development', description: 'Tailored software built to your exact requirements' },
-  { icon: Palette, title: 'UI / UX Design', description: 'Clean, intuitive, user-focused designs' },
-  { icon: Cloud, title: 'SaaS Development', description: 'End-to-end SaaS products from idea to launch' },
-  { icon: Wrench, title: 'Maintenance & Support', description: 'Long-term support, updates & optimization' },
-];
+import { adminService } from '@/services/admin.service';
 
 const Index = () => {
   const [featuredProjects, setFeaturedProjects] = useState([]);
   const [projectsLoading, setProjectsLoading] = useState(true);
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [teamLoading, setTeamLoading] = useState(true);
 
-  // Fetch featured projects
+  const services = [
+    { icon: Code2, title: 'Ready-made Projects', description: 'Production-ready applications you can deploy instantly' },
+    { icon: Rocket, title: 'Web Application Development', description: 'Scalable, secure, modern web apps for businesses' },
+    { icon: Smartphone, title: 'Mobile App Development', description: 'Cross-platform iOS & Android applications' },
+    { icon: Users, title: 'Custom Development', description: 'Tailored software built to your exact requirements' },
+    { icon: Palette, title: 'UI / UX Design', description: 'Clean, intuitive, user-focused designs' },
+    { icon: Cloud, title: 'SaaS Development', description: 'End-to-end SaaS products from idea to launch' },
+    { icon: Wrench, title: 'Maintenance & Support', description: 'Long-term support, updates & optimization' },
+  ];
+
+  // Fetch featured projects and team members
   useEffect(() => {
     const fetchFeaturedProjects = async () => {
       try {
         setProjectsLoading(true);
         const response = await projectService.getAllProjects({ 
           limit: 6, 
-          sortBy: 'purchases' 
+          sortBy: 'created_at' 
         });
         
         if (response.success) {
@@ -48,7 +45,23 @@ const Index = () => {
       }
     };
 
+    const fetchTeamMembers = async () => {
+      try {
+        setTeamLoading(true);
+        const response = await adminService.getAllDevelopers();
+        
+        if (response.success) {
+          setTeamMembers(response.data.developers || []);
+        }
+      } catch (error) {
+        console.error('Error fetching team members:', error);
+      } finally {
+        setTeamLoading(false);
+      }
+    };
+
     fetchFeaturedProjects();
+    fetchTeamMembers();
   }, []);
   return (
     <div className="flex flex-col">
@@ -171,7 +184,7 @@ const Index = () => {
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredProjects.map((project, index) => (
-                <ProjectCard key={project.id} {...project} index={index} />
+                <ProjectCard key={project._id} id={project._id} slug={project._id} {...project} index={index} />
               ))}
             </div>
           )}
@@ -191,11 +204,48 @@ const Index = () => {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <SectionHeader badge="The Team" title="Meet Our Experts" description="Talented developers ready to bring your vision to life" />
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            {teamMembers.map((member, index) => (
-              <DeveloperCard key={member.name} {...member} index={index} />
-            ))}
-          </div>
+          
+          {teamLoading ? (
+            <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+              {[...Array(3)].map((_, index) => (
+                <div key={index} className="animate-pulse">
+                  <div className="bg-muted rounded-xl h-80"></div>
+                </div>
+              ))}
+            </div>
+          ) : teamMembers.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="max-w-md mx-auto">
+                <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Users className="h-12 w-12 text-muted-foreground" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">No team members yet</h3>
+                <p className="text-muted-foreground">
+                  Our team is growing! Check back soon to meet our talented developers.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+              {teamMembers.map((member, index) => (
+                <DeveloperCard 
+                  key={member.id || member.name} 
+                  name={member.name}
+                  title={member.experience || 'Developer'}
+                  avatarUrl={member.avatar}
+                  bio={member.bio}
+                  specializations={member.skills ? member.skills.slice(0, 3) : []}
+                  skills={member.skills || []}
+                  githubUrl={member.github}
+                  linkedinUrl={member.linkedin}
+                  portfolioUrl={member.portfolio}
+                  experienceYears={0} // Database doesn't have this field
+                  index={index} 
+                />
+              ))}
+            </div>
+          )}
+          
           <div className="text-center mt-10">
             <Button asChild variant="outline" size="lg">
               <Link to="/team">View Full Team</Link>

@@ -5,7 +5,7 @@ export interface ClientRequestData {
   email: string;
   phone?: string;
   company?: string;
-  projectType: string;
+  projectType: string; // This will be mapped to project_type in the controller
   budget: string;
   timeline: string;
   description: string;
