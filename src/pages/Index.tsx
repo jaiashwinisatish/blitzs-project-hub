@@ -1,20 +1,12 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Code2, Smartphone, Users, Zap, Sparkles, CheckCircle } from 'lucide-react';
+import { ArrowRight, Code2, Smartphone, Users, Zap, Sparkles, CheckCircle, Palette, Rocket, Wrench, Cloud } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SectionHeader } from '@/components/ui/section-header';
 import { ProjectCard } from '@/components/ui/project-card';
 import { DeveloperCard } from '@/components/ui/developer-card';
-
-// Demo data
-const featuredProjects = [
-  { id: '1', slug: 'ecommerce-platform', title: 'E-Commerce Platform', shortDescription: 'Complete online store with cart, payments, and admin dashboard', category: 'full-stack', price: 299, techStack: ['React', 'Node.js', 'PostgreSQL', 'Stripe'], thumbnailUrl: '' },
-  { id: '2', slug: 'task-manager', title: 'Task Management App', shortDescription: 'Collaborative task manager with real-time updates', category: 'full-stack', price: 199, techStack: ['React', 'Supabase', 'Tailwind'], thumbnailUrl: '' },
-  { id: '3', slug: 'fitness-tracker', title: 'Fitness Tracker', shortDescription: 'Mobile app for tracking workouts and nutrition', category: 'mobile', price: 349, techStack: ['React Native', 'Firebase', 'Charts'], thumbnailUrl: '' },
-  { id: '4', slug: 'crm-system', title: 'CRM System', shortDescription: 'Customer relationship management with analytics', category: 'full-stack', price: 499, techStack: ['React', 'Express', 'MongoDB', 'Charts'], thumbnailUrl: '' },
-  { id: '5', slug: 'social-media-app', title: 'Social Media App', shortDescription: 'Full-featured social platform with messaging', category: 'mobile', price: 599, techStack: ['React Native', 'Node.js', 'Socket.io'], thumbnailUrl: '' },
-  { id: '6', slug: 'booking-system', title: 'Booking System', shortDescription: 'Appointment scheduling with calendar integration', category: 'full-stack', price: 249, techStack: ['React', 'Supabase', 'Calendar API'], thumbnailUrl: '' },
-];
+import { projectService } from '@/services/project.service';
 
 const teamMembers = [
   { name: 'Alex Chen', title: 'Lead Full-Stack Developer', specializations: ['React', 'Node.js', 'Cloud'], skills: ['TypeScript', 'PostgreSQL', 'AWS', 'Docker', 'GraphQL'], experienceYears: 8, githubUrl: '#', linkedinUrl: '#' },
@@ -24,11 +16,40 @@ const teamMembers = [
 
 const services = [
   { icon: Code2, title: 'Ready-made Projects', description: 'Production-ready applications you can deploy instantly' },
-  { icon: Smartphone, title: 'Mobile Apps', description: 'Cross-platform mobile applications for iOS and Android' },
-  { icon: Users, title: 'Custom Development', description: 'Tailored solutions built to your exact specifications' },
+  { icon: Rocket, title: 'Web Application Development', description: 'Scalable, secure, modern web apps for businesses' },
+  { icon: Smartphone, title: 'Mobile App Development', description: 'Cross-platform iOS & Android applications' },
+  { icon: Users, title: 'Custom Development', description: 'Tailored software built to your exact requirements' },
+  { icon: Palette, title: 'UI / UX Design', description: 'Clean, intuitive, user-focused designs' },
+  { icon: Cloud, title: 'SaaS Development', description: 'End-to-end SaaS products from idea to launch' },
+  { icon: Wrench, title: 'Maintenance & Support', description: 'Long-term support, updates & optimization' },
 ];
 
 const Index = () => {
+  const [featuredProjects, setFeaturedProjects] = useState([]);
+  const [projectsLoading, setProjectsLoading] = useState(true);
+
+  // Fetch featured projects
+  useEffect(() => {
+    const fetchFeaturedProjects = async () => {
+      try {
+        setProjectsLoading(true);
+        const response = await projectService.getAllProjects({ 
+          limit: 6, 
+          sortBy: 'purchases' 
+        });
+        
+        if (response.success) {
+          setFeaturedProjects(response.data.projects);
+        }
+      } catch (error) {
+        console.error('Error fetching featured projects:', error);
+      } finally {
+        setProjectsLoading(false);
+      }
+    };
+
+    fetchFeaturedProjects();
+  }, []);
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
@@ -100,8 +121,8 @@ const Index = () => {
       {/* Services Section */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
-          <SectionHeader badge="What We Offer" title="Our Services" description="From ready-made solutions to custom development, we've got you covered" />
-          <div className="grid md:grid-cols-3 gap-6">
+          <SectionHeader badge="What We Offer" title="Our Services" description="From ready-made solutions to fully custom software, we've got you covered" />
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {services.map((service, index) => (
               <motion.div
                 key={service.title}
@@ -109,7 +130,7 @@ const Index = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all group"
+                className="p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all group hover:shadow-lg"
               >
                 <div className="w-12 h-12 rounded-lg bg-blitz-gradient flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   <service.icon className="h-6 w-6 text-primary-foreground" />
@@ -126,11 +147,35 @@ const Index = () => {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <SectionHeader badge="Our Work" title="Featured Projects" description="Discover our latest production-ready applications" />
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredProjects.map((project, index) => (
-              <ProjectCard key={project.id} {...project} index={index} />
-            ))}
-          </div>
+          
+          {projectsLoading ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, index) => (
+                <div key={index} className="animate-pulse">
+                  <div className="bg-muted rounded-xl h-80"></div>
+                </div>
+              ))}
+            </div>
+          ) : featuredProjects.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="max-w-md mx-auto">
+                <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Code2 className="h-12 w-12 text-muted-foreground" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">No projects yet</h3>
+                <p className="text-muted-foreground">
+                  Check back soon for our latest projects!
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredProjects.map((project, index) => (
+                <ProjectCard key={project.id} {...project} index={index} />
+              ))}
+            </div>
+          )}
+          
           <div className="text-center mt-10">
             <Button asChild variant="outline" size="lg">
               <Link to="/projects">

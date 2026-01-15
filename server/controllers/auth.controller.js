@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { supabase } from '../config/supabase.js';
+import { supabaseAdmin } from '../config/supabase.js';
 import { hashPassword, comparePassword, generateToken } from '../utils/auth.js';
 import validator from 'validator';
 
@@ -119,8 +119,11 @@ export const signUp = async (req, res) => {
 };
 
 export const signIn = async (req, res) => {
+  console.log('🚀 SIGNIN CONTROLLER CALLED!!! - UPDATED');
   try {
     const { email, password } = req.body;
+
+    console.log('🔍 Login attempt:', { email, password: '***' });
 
     // Validation
     if (!email || !password) {
@@ -130,7 +133,61 @@ export const signIn = async (req, res) => {
       });
     }
 
-    // Sign in with Supabase
+    // First try to find user in our database (for admin users)
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('users')
+      .select('*')
+      .eq('email', email);
+
+    console.log('👤 Database query result:', { 
+      found: profile?.length || 0, 
+      error: profileError?.message 
+    });
+
+    if (profile && profile.length > 0 && !profileError) {
+      const user = profile[0]; // Take the first result
+      console.log('✅ User found in database, verifying password...');
+      
+      // User exists in our database, verify password
+      const isPasswordValid = await comparePassword(password, user.password);
+      
+      console.log('🔒 Password verification result:', isPasswordValid);
+      
+      if (!isPasswordValid) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid email or password'
+        });
+      }
+
+      console.log('🎉 Login successful, generating token...');
+
+      // Generate JWT token
+      const token = generateToken(user.id);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Login successful',
+        data: {
+          user: {
+            id: user.id,
+            fullName: user.full_name,
+            email: user.email,
+            role: user.role,
+            avatar: user.avatar || '',
+            purchasedProjects: user.purchased_projects || [],
+            orders: user.orders || [],
+            clientRequests: user.client_requests || [],
+            createdAt: user.created_at
+          },
+          token
+        }
+      });
+    }
+
+    console.log('❌ User not found in database, trying Supabase Auth...');
+
+    // If not found in our database, try Supabase Auth
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
@@ -145,14 +202,14 @@ export const signIn = async (req, res) => {
     }
 
     // Get user profile from our users table
-    const { data: profile, error: profileError } = await supabase
+    const { data: userProfile, error: userProfileError } = await supabase
       .from('users')
       .select('*')
       .eq('id', data.user.id)
       .single();
 
-    if (profileError || !profile) {
-      console.error('Profile fetch error:', profileError);
+    if (userProfileError || !userProfile) {
+      console.error('Profile fetch error:', userProfileError);
       return res.status(500).json({
         success: false,
         message: 'Failed to fetch user profile'
@@ -167,15 +224,15 @@ export const signIn = async (req, res) => {
       message: 'Login successful',
       data: {
         user: {
-          id: profile.id,
-          fullName: profile.full_name,
-          email: profile.email,
-          role: profile.role,
-          avatar: profile.avatar,
-          purchasedProjects: profile.purchased_projects || [],
-          orders: profile.orders || [],
-          clientRequests: profile.client_requests || [],
-          createdAt: profile.created_at
+          id: userProfile.id,
+          fullName: userProfile.full_name,
+          email: userProfile.email,
+          role: userProfile.role,
+          avatar: userProfile.avatar,
+          purchasedProjects: userProfile.purchased_projects || [],
+          orders: userProfile.orders || [],
+          clientRequests: userProfile.client_requests || [],
+          createdAt: userProfile.created_at
         },
         token
       }

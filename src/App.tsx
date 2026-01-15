@@ -8,8 +8,6 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { MainLayout } from "@/components/layout/MainLayout";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
-<<<<<<< HEAD
-=======
 import Signup from "./pages/Signup";
 import UserDashboard from "./pages/UserDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -17,7 +15,6 @@ import Projects from "./pages/Projects";
 import Team from "./pages/Team";
 import Guide from "./pages/Guide";
 import Contact from "./pages/Contact";
->>>>>>> 8457b0d (Merged local code with GitHub repo)
 import GetStarted from "./pages/GetStarted";
 import NotFound from "./pages/NotFound";
 
@@ -34,10 +31,6 @@ const App = () => (
             <Routes>
               <Route element={<MainLayout />}>
                 <Route path="/" element={<Index />} />
-<<<<<<< HEAD
-              </Route>
-              <Route path="/login" element={<Login />} />
-=======
                 <Route path="/projects" element={<Projects />} />
                 <Route path="/team" element={<Team />} />
                 <Route path="/how-to-use" element={<Guide />} />
@@ -47,7 +40,6 @@ const App = () => (
               </Route>
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
->>>>>>> 8457b0d (Merged local code with GitHub repo)
               <Route path="/get-started" element={<GetStarted />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

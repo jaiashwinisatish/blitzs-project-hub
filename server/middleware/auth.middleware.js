@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { supabase } from '../config/supabase.js';
+import { supabaseAdmin, verifySupabaseToken, verifyCustomToken } from '../config/supabase.js';
 
 export const authenticate = async (req, res, next) => {
   try {
@@ -12,59 +12,48 @@ export const authenticate = async (req, res, next) => {
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded) {
-      return res.status(401).json({ 
-        success: false, 
-        message: 'Invalid token.' 
-      });
+    let user;
+    
+    try {
+      // Try to verify as Supabase token first
+      user = await verifySupabaseToken(token);
+    } catch (supabaseError) {
+      try {
+        // Try to verify as custom token
+        user = verifyCustomToken(token);
+      } catch (customError) {
+        return res.status(401).json({ 
+          success: false, 
+          message: 'Invalid token.' 
+        });
+      }
     }
 
     // Get user from Supabase
-    const { data: user, error } = await supabase
+    const { data: userData, error } = await supabaseAdmin
       .from('users')
-      .select('id, full_name, email, role, is_active')
-      .eq('id', decoded.id)
+      .select('*')
+      .eq('id', user.id)
       .single();
 
-    if (error || !user) {
+    if (error || !userData) {
       return res.status(401).json({ 
         success: false, 
         message: 'Invalid token. User not found.' 
       });
     }
 
-    if (!user.is_active) {
+    if (!userData.is_active) {
       return res.status(401).json({ 
         success: false, 
         message: 'Account is deactivated.' 
       });
     }
 
-    req.user = {
-      id: user.id,
-      fullName: user.full_name,
-      email: user.email,
-      role: user.role,
-      isActive: user.is_active
-    };
-    
+    req.user = userData;
     next();
   } catch (error) {
-    if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({ 
-        success: false, 
-        message: 'Invalid token.' 
-      });
-    }
-    
-    if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ 
-        success: false, 
-        message: 'Token expired.' 
-      });
-    }
-
+    console.error('Authentication error:', error);
     res.status(500).json({ 
       success: false, 
       message: 'Server error in authentication.' 
@@ -90,4 +79,41 @@ export const authorize = (...roles) => {
 
     next();
   };
+};
+
+// Optional authentication (doesn't fail if no token)
+export const optionalAuth = async (req, res, next) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
+    if (token) {
+      try {
+        let user;
+        
+        try {
+          user = await verifySupabaseToken(token);
+        } catch (supabaseError) {
+          user = verifyCustomToken(token);
+        }
+
+        const { data: userData, error } = await supabaseAdmin
+          .from('users')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (!error && userData && userData.is_active) {
+          req.user = userData;
+        }
+      } catch (error) {
+        // Ignore authentication errors for optional auth
+        console.log('Optional auth failed:', error.message);
+      }
+    }
+
+    next();
+  } catch (error) {
+    console.error('Optional authentication error:', error);
+    next();
+  }
 };

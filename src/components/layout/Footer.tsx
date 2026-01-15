@@ -37,7 +37,7 @@ export const Footer = () => {
             </p>
             <div className="flex gap-3">
               <a
-                href="https://github.com"
+                href="https://github.com/jaiashwinisatish"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
@@ -45,7 +45,7 @@ export const Footer = () => {
                 <Github className="h-4 w-4" />
               </a>
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/in/ashwini-jaiswal-095165282/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
@@ -53,7 +53,7 @@ export const Footer = () => {
                 <Linkedin className="h-4 w-4" />
               </a>
               <a
-                href="https://twitter.com"
+                href="https://x.com/JaiswalAsh37526"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
@@ -61,7 +61,7 @@ export const Footer = () => {
                 <Twitter className="h-4 w-4" />
               </a>
               <a
-                href="mailto:hello@blitzs.dev"
+                href="mailto:ashwinijaiswal756@gmail.com"
                 className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
               >
                 <Mail className="h-4 w-4" />

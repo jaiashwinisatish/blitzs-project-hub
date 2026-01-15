@@ -7,8 +7,8 @@ import {
   getAllProjectsAdmin,
   getAllClientRequests,
   updateRequestStatus,
-  addDeveloper,
-  getAllDevelopers
+  getAllDevelopers,
+  addDeveloper
 } from '../controllers/admin.controller.js';
 import { authenticate, authorize } from '../middleware/auth.middleware.js';
 
@@ -28,12 +28,12 @@ router.put('/users/:id/toggle-status', toggleUserStatus);
 // Project management
 router.get('/projects', getAllProjectsAdmin);
 
+// Developer management
+router.get('/developers', getAllDevelopers);
+router.post('/developers', addDeveloper);
+
 // Client request management
 router.get('/requests', getAllClientRequests);
 router.put('/requests/:id/status', updateRequestStatus);
-
-// Developer management
-router.post('/developers', addDeveloper);
-router.get('/developers', getAllDevelopers);
 
 export default router;
