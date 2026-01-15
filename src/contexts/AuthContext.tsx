@@ -1,10 +1,29 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+<<<<<<< HEAD
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
+=======
+import { authService } from '@/services/auth.service';
+
+interface User {
+  id: string;
+  fullName: string;
+  email: string;
+  role: string;
+  avatar?: string;
+  purchasedProjects: string[];
+  orders: string[];
+  clientRequests: string[];
+  createdAt: string;
+}
+
+interface AuthContextType {
+  user: User | null;
+>>>>>>> 8457b0d (Merged local code with GitHub repo)
   isLoading: boolean;
   isAdmin: boolean;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
@@ -16,6 +35,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+<<<<<<< HEAD
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -76,10 +96,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return () => subscription.unsubscribe();
+=======
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        const token = authService.getToken();
+        const storedUser = authService.getUser();
+
+        if (token && storedUser) {
+          setUser(storedUser);
+          setIsAdmin(storedUser.role === 'admin');
+          
+          // Verify token is still valid by fetching fresh profile
+          try {
+            const response = await authService.getProfile();
+            if (response.success) {
+              setUser(response.data.user);
+              authService.setUser(response.data.user);
+              setIsAdmin(response.data.user.role === 'admin');
+            }
+          } catch (error) {
+            // Token invalid, clear storage
+            authService.logout();
+          }
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initAuth();
+>>>>>>> 8457b0d (Merged local code with GitHub repo)
   }, []);
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
+<<<<<<< HEAD
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -94,11 +151,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { error: error as Error | null };
     } catch (error) {
       return { error: error as Error };
+=======
+      const response = await authService.register({ fullName, email, password });
+      
+      if (response.success) {
+        setUser(response.data.user);
+        authService.setToken(response.data.token);
+        authService.setUser(response.data.user);
+        setIsAdmin(response.data.user.role === 'admin');
+      }
+      
+      return { error: null };
+    } catch (error: any) {
+      return { error: error.response?.data?.message || error.message };
+>>>>>>> 8457b0d (Merged local code with GitHub repo)
     }
   };
 
   const signIn = async (email: string, password: string) => {
     try {
+<<<<<<< HEAD
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -107,11 +179,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { error: error as Error | null };
     } catch (error) {
       return { error: error as Error };
+=======
+      const response = await authService.login({ email, password });
+      
+      if (response.success) {
+        setUser(response.data.user);
+        authService.setToken(response.data.token);
+        authService.setUser(response.data.user);
+        setIsAdmin(response.data.user.role === 'admin');
+      }
+      
+      return { error: null };
+    } catch (error: any) {
+      return { error: error.response?.data?.message || error.message };
+>>>>>>> 8457b0d (Merged local code with GitHub repo)
     }
   };
 
   const signOut = async () => {
+<<<<<<< HEAD
     await supabase.auth.signOut();
+=======
+    authService.logout();
+    setUser(null);
+>>>>>>> 8457b0d (Merged local code with GitHub repo)
     setIsAdmin(false);
   };
 
@@ -119,7 +210,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider
       value={{
         user,
+<<<<<<< HEAD
         session,
+=======
+>>>>>>> 8457b0d (Merged local code with GitHub repo)
         isLoading,
         isAdmin,
         signUp,

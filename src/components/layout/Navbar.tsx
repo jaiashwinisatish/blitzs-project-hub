@@ -106,21 +106,33 @@ export const Navbar = () => {
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
+<<<<<<< HEAD
                     <Link to="/dashboard" className="cursor-pointer">
+=======
+                    <Link to="/user-dashboard" className="cursor-pointer">
+>>>>>>> 8457b0d (Merged local code with GitHub repo)
                       <LayoutDashboard className="mr-2 h-4 w-4" />
                       Dashboard
                     </Link>
                   </DropdownMenuItem>
                   {isAdmin && (
                     <DropdownMenuItem asChild>
+<<<<<<< HEAD
                       <Link to="/admin" className="cursor-pointer">
+=======
+                      <Link to="/admin-dashboard" className="cursor-pointer">
+>>>>>>> 8457b0d (Merged local code with GitHub repo)
                         <Settings className="mr-2 h-4 w-4" />
                         Admin Panel
                       </Link>
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem asChild>
+<<<<<<< HEAD
                     <Link to="/dashboard/profile" className="cursor-pointer">
+=======
+                    <Link to="/user-dashboard" className="cursor-pointer">
+>>>>>>> 8457b0d (Merged local code with GitHub repo)
                       <User className="mr-2 h-4 w-4" />
                       Profile
                     </Link>

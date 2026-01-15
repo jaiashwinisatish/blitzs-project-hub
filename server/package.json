@@ -1,0 +1,36 @@
+{
+  "name": "blitzs-server",
+  "version": "1.0.0",
+  "description": "Backend server for Blitzs Project Hub",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "seed": "node utils/seed.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.90.1",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.0.3",
+    "validator": "^13.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "keywords": [
+    "blitzs",
+    "project-hub",
+    "nodejs",
+    "express",
+    "mongodb"
+  ],
+  "author": "Blitzs Team",
+  "license": "MIT"
+}
