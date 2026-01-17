@@ -94,9 +94,15 @@ const Contact = () => {
     setIsLoading(true);
 
     try {
+      // Map form data to database schema
       const requestData = {
-        ...formData,
-        requirements: formData.requirements.filter(req => req.trim() !== '')
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        project_type: formData.projectType,
+        budget: formData.budget,
+        timeline: formData.timeline,
+        description: formData.description
       };
 
       const response = await clientService.createClientRequest(requestData);
@@ -104,9 +110,12 @@ const Contact = () => {
       if (response.success) {
         setIsSubmitted(true);
         toast.success(response.message);
+      } else {
+        toast.error(response.message || 'Failed to submit request');
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to submit request. Please try again.');
+      console.error('Submit error:', error);
+      toast.error('Failed to submit request. Please try again.');
     } finally {
       setIsLoading(false);
     }

@@ -7,7 +7,7 @@ import { SectionHeader } from '@/components/ui/section-header';
 import { ProjectCard } from '@/components/ui/project-card';
 import { DeveloperCard } from '@/components/ui/developer-card';
 import { projectService } from '@/services/project.service';
-import { adminService } from '@/services/admin.service';
+import { supabase } from '@/lib/supabase';
 
 const Index = () => {
   const [featuredProjects, setFeaturedProjects] = useState([]);
@@ -48,10 +48,17 @@ const Index = () => {
     const fetchTeamMembers = async () => {
       try {
         setTeamLoading(true);
-        const response = await adminService.getAllDevelopers();
+        const { data: developers, error } = await supabase
+          .from('developers')
+          .select('*')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false })
+          .limit(6);
         
-        if (response.success) {
-          setTeamMembers(response.data.developers || []);
+        if (error) {
+          console.error('Error fetching team members:', error);
+        } else {
+          setTeamMembers(developers || []);
         }
       } catch (error) {
         console.error('Error fetching team members:', error);
@@ -184,7 +191,7 @@ const Index = () => {
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredProjects.map((project, index) => (
-                <ProjectCard key={project._id} id={project._id} slug={project._id} {...project} index={index} />
+                <ProjectCard key={project.id} {...project} index={index} />
               ))}
             </div>
           )}

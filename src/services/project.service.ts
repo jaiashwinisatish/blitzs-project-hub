@@ -54,14 +54,11 @@ export const projectService = {
     try {
       let query = supabase
         .from('projects')
-        .select(`
-          *,
-          added_by:profiles(id, full_name)
-        `, { count: 'exact' })
+        .select('*', { count: 'exact' })
         .eq('is_published', true);
 
       // Apply filters
-      if (params?.category) {
+      if (params?.category && params.category !== 'all') {
         query = query.eq('category', params.category);
       }
 
@@ -89,6 +86,7 @@ export const projectService = {
       const { data: projects, error, count } = await query;
 
       if (error) {
+        console.error('Supabase query error:', error);
         throw error;
       }
 
@@ -108,6 +106,7 @@ export const projectService = {
         }
       };
     } catch (error) {
+      console.error('Get all projects error:', error);
       return {
         success: false,
         data: {
