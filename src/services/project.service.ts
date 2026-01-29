@@ -357,6 +357,7 @@ export const projectService = {
 
   async createProject(projectData: {
     title: string;
+    short_description: string;
     description: string;
     price: number;
     category: string;
@@ -368,8 +369,15 @@ export const projectService = {
       const { data, error } = await supabase
         .from('projects')
         .insert([{
-          ...projectData,
+          title: projectData.title,
+          short_description: projectData.short_description,
+          full_description: projectData.description,
+          slug: projectData.title.toLowerCase().replace(/\s+/g, '-'),
+          price: projectData.price,
+          category: projectData.category,
+          images: projectData.images,
           is_published: projectData.is_published ?? true,
+          added_by: projectData.added_by,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         }])

@@ -16,6 +16,7 @@ const AddProject = () => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
+    short_description: '',
     description: '',
     price: '',
     category: '',
@@ -40,6 +41,7 @@ const AddProject = () => {
     try {
       const projectData = {
         title: formData.title,
+        short_description: formData.short_description,
         description: formData.description,
         price: parseFloat(formData.price) || 0,
         category: formData.category,
@@ -101,6 +103,16 @@ const AddProject = () => {
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                   placeholder="Project title"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Short Description</label>
+                <Input
+                  value={formData.short_description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, short_description: e.target.value }))}
+                  placeholder="Brief summary for project cards"
                   required
                 />
               </div>
