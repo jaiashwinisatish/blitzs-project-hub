@@ -6,6 +6,7 @@ export interface User {
   full_name?: string;
   role?: string;
   avatar?: string;
+  avatar_path?: string;
   created_at?: string;
 }
 
@@ -37,6 +38,7 @@ export const authService = {
         full_name: data.user.user_metadata?.full_name,
         role: data.user.user_metadata?.role || 'user',
         avatar: data.user.user_metadata?.avatar,
+        avatar_path: data.user.user_metadata?.avatar_path,
         created_at: data.user.created_at
       } : null;
 
@@ -81,6 +83,7 @@ export const authService = {
         full_name: data.user.user_metadata?.full_name,
         role: data.user.user_metadata?.role || 'user',
         avatar: data.user.user_metadata?.avatar,
+        avatar_path: data.user.user_metadata?.avatar_path,
         created_at: data.user.created_at
       } : null;
 
@@ -124,6 +127,7 @@ export const authService = {
         full_name: user.user_metadata?.full_name,
         role: user.user_metadata?.role || 'user',
         avatar: user.user_metadata?.avatar,
+        avatar_path: user.user_metadata?.avatar_path,
         created_at: user.created_at
       } : null;
 
@@ -144,7 +148,8 @@ export const authService = {
       const { data, error } = await supabase.auth.updateUser({
         data: {
           full_name: userData.full_name,
-          avatar: userData.avatar
+          avatar: userData.avatar,
+          avatar_path: (userData as any).avatar_path
         }
       });
 

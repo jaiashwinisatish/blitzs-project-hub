@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { uploadImage, validateImageFile } from '@/services/upload.service';
+import { uploadImage, validateImageFile, removeImage } from '@/services/upload.service';
 import { authService } from '@/services/auth.service';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -31,9 +31,19 @@ const AvatarUpload: React.FC = () => {
     setIsUploading(true);
     try {
       // Use Supabase storage upload
-      const url = await uploadImage(file, user.id);
-      // Update user profile avatar
-      const { user: updated, error } = await authService.updateProfile({ avatar: url });
+      const { publicUrl, path } = await uploadImage(file, user.id);
+
+      // Remove previous avatar file if available (best-effort)
+      if ((user as any).avatar_path) {
+        try {
+          await removeImage((user as any).avatar_path);
+        } catch (err) {
+          console.warn('Failed to remove previous avatar', err);
+        }
+      }
+
+      // Update user profile avatar and record storage path
+      const { user: updated, error } = await authService.updateProfile({ avatar: publicUrl, avatar_path: path });
       if (error) {
         toast.error('Failed to update avatar');
       } else {
