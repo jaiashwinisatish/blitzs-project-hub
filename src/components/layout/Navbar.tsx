@@ -104,6 +104,9 @@ export const Navbar = () => {
                       <DropdownMenuItem asChild>
                         <Link to="/settings#avatar">Change Avatar</Link>
                       </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/add-project">Add Project</Link>
+                      </DropdownMenuItem>
                       {isAdmin && (
                         <DropdownMenuItem asChild>
                           <Link to="/admin-dashboard">Admin Dashboard</Link>
@@ -190,6 +193,9 @@ export const Navbar = () => {
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/settings#avatar" onClick={() => setIsOpen(false)}>Change Avatar</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/add-project" onClick={() => setIsOpen(false)}>Add Project</Link>
                     </DropdownMenuItem>
                     {isAdmin && (
                       <DropdownMenuItem asChild>
