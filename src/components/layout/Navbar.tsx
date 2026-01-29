@@ -3,6 +3,14 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
 
 const navLinks = [
@@ -60,27 +68,47 @@ export const Navbar = () => {
               <div className="flex items-center gap-2">
                 {/* Profile dropdown: show avatar or initials, profile link and sign out */}
                 <div className="hidden md:flex items-center gap-2">
-                  <Link to="/user-dashboard" className="flex items-center gap-2">
-                    {user.avatar ? (
-                      <img
-                        src={user.avatar}
-                        alt={user.full_name || user.email}
-                        className="h-8 w-8 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="h-8 w-8 rounded-full bg-muted-foreground text-background flex items-center justify-center text-sm font-medium">
-                        {user.full_name
-                          ? user.full_name.split(" ").map(n => n[0]).slice(0,2).join("")
-                          : user.email?.split("@")[0].slice(0,2).toUpperCase()}
-                      </div>
-                    )}
-                    <span className="text-sm hidden md:inline text-muted-foreground">
-                      {user.full_name || user.email?.split("@")[0]}
-                    </span>
-                  </Link>
-                  <Button variant="outline" size="sm" onClick={() => signOut()}>
-                    Sign Out
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="flex items-center gap-2 focus:outline-none">
+                        {user.avatar ? (
+                          <img
+                            src={user.avatar}
+                            alt={user.full_name || user.email}
+                            className="h-8 w-8 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="h-8 w-8 rounded-full bg-muted-foreground text-background flex items-center justify-center text-sm font-medium">
+                            {user.full_name
+                              ? user.full_name.split(" ").map((n) => n[0]).slice(0, 2).join("")
+                              : user.email?.split("@")[0].slice(0, 2).toUpperCase()}
+                          </div>
+                        )}
+                        <span className="text-sm hidden md:inline text-muted-foreground">
+                          {user.full_name || user.email?.split("@")[0]}
+                        </span>
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel className="truncate">
+                        {user.full_name || user.email}
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/user-dashboard">Profile</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/settings">Settings</Link>
+                      </DropdownMenuItem>
+                      {isAdmin && (
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin-dashboard">Admin Dashboard</Link>
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onSelect={() => signOut()}>Sign Out</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             ) : (
