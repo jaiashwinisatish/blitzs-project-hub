@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { ArrowLeft, ShoppingCart, Download, ExternalLink, Star, Check, Github, Eye } from 'lucide-react';
 
@@ -70,8 +71,83 @@ const ProjectDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      <div className="min-h-screen bg-background">
+        {/* Header Skeleton */}
+        <section className="py-12 bg-gradient-to-br from-primary/10 to-secondary/10">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center gap-4 mb-6">
+              <Skeleton className="h-9 w-28" />
+            </div>
+            <div className="max-w-4xl mx-auto">
+              <div className="flex flex-col lg:flex-row gap-8 items-start">
+                <div className="lg:w-2/3">
+                  <Skeleton className="h-10 w-3/4 mb-4" />
+                  <Skeleton className="h-6 w-full mb-6" />
+                  <div className="flex flex-wrap gap-4 mb-6">
+                    <Skeleton className="h-6 w-20" />
+                    <Skeleton className="h-6 w-20" />
+                    <Skeleton className="h-6 w-20" />
+                  </div>
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    <Skeleton className="h-6 w-16" />
+                    <Skeleton className="h-6 w-20" />
+                    <Skeleton className="h-6 w-18" />
+                  </div>
+                </div>
+                <div className="lg:w-1/3 w-full">
+                  <Card>
+                    <CardHeader>
+                      <div className="text-center">
+                        <Skeleton className="h-8 w-24 mx-auto mb-2" />
+                        <Skeleton className="h-6 w-20 mx-auto" />
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <Skeleton className="h-11 w-full" />
+                      <div className="flex gap-2">
+                        <Skeleton className="h-10 w-1/2" />
+                        <Skeleton className="h-10 w-1/2" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Project Details Skeleton */}
+        <section className="py-12">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <div className="grid md:grid-cols-2 gap-8">
+              <Card>
+                <CardHeader>
+                  <Skeleton className="h-6 w-32" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-4 w-full mb-2" />
+                  <Skeleton className="h-4 w-full mb-2" />
+                  <Skeleton className="h-4 w-2/3" />
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <Skeleton className="h-6 w-24" />
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {[...Array(4)].map((_, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <Skeleton className="h-4 w-4 rounded-full" />
+                        <Skeleton className="h-4 w-3/4" />
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
       </div>
     );
   }

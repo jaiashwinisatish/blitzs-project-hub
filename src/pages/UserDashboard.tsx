@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { User, ShoppingBag, FileText, Download, LogOut, Edit } from 'lucide-react';
 
@@ -58,8 +59,76 @@ const UserDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <Skeleton className="h-9 w-48 mb-2" />
+              <Skeleton className="h-5 w-64" />
+            </div>
+            <Skeleton className="h-10 w-24" />
+          </div>
+
+          <Tabs defaultValue="profile" className="space-y-6">
+            <Skeleton className="h-10 w-full grid-cols-4" />
+
+            <TabsContent value="profile">
+              <Card>
+                <CardHeader>
+                  <Skeleton className="h-6 w-48 mb-2" />
+                  <Skeleton className="h-4 w-64" />
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Skeleton className="h-4 w-24 mb-1" />
+                      <Skeleton className="h-4 w-32" />
+                    </div>
+                    <div>
+                      <Skeleton className="h-4 w-16 mb-1" />
+                      <Skeleton className="h-4 w-48" />
+                    </div>
+                    <div>
+                      <Skeleton className="h-5 w-16" />
+                    </div>
+                    <div>
+                      <Skeleton className="h-4 w-32" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-10 w-32 mt-4" />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="orders">
+              <Card>
+                <CardHeader>
+                  <Skeleton className="h-6 w-40 mb-2" />
+                  <Skeleton className="h-4 w-56" />
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <Skeleton className="h-5 w-48 mb-1" />
+                            <Skeleton className="h-4 w-32 mb-1" />
+                            <Skeleton className="h-4 w-24" />
+                          </div>
+                          <div className="text-right">
+                            <Skeleton className="h-5 w-20 mb-2" />
+                            <Skeleton className="h-9 w-28" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     );
   }
