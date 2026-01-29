@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Search, Filter, ShoppingCart, ExternalLink, Star, Download, Eye, Upload } from 'lucide-react';
+import { Search, Filter, ShoppingCart, ExternalLink, Star, Download, Eye, Upload, ChevronRight } from 'lucide-react';
 
 const Projects = () => {
   const { user } = useAuth();
@@ -99,6 +99,19 @@ const Projects = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Breadcrumb Navigation */}
+      <section className="py-4 border-b bg-muted/30">
+        <div className="container mx-auto px-4">
+          <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
+            <Link to="/" className="hover:text-foreground transition-colors">
+              Home
+            </Link>
+            <ChevronRight className="h-4 w-4" />
+            <span className="text-foreground font-medium">Projects</span>
+          </nav>
+        </div>
+      </section>
+
       {/* Header */}
       <section className="py-20 bg-gradient-to-br from-primary/10 to-secondary/10">
         <div className="container mx-auto px-4 text-center">
