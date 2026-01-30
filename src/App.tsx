@@ -6,6 +6,7 @@ import { Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { MainLayout } from "@/components/layout/MainLayout";
+import Particles from "../components/reactbits/Particles";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -22,6 +23,8 @@ import NotFound from "./pages/NotFound";
 import Unauthorized from "./pages/Unauthorized";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import QuickSetup from "@/components/admin/QuickSetup";
+import Settings from "./pages/Settings";
+import AddProject from "./pages/AddProject";
 
 const queryClient = new QueryClient();
 
@@ -30,14 +33,18 @@ const App = () => (
     <ThemeProvider>
       <AuthProvider>
         <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <Routes>
+          <div className="relative z-10">
+            <Toaster />
+            <Sonner />
+            <Routes>
             <Route element={<MainLayout />}>
               <Route path="/" element={<Index />} />
               <Route path="/team" element={<Team />} />
               <Route path="/how-to-use" element={<Guide />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/projects" element={<Projects />} />
+              <Route path="/projects/:projectId" element={<ProjectDetail />} />
+              <Route path="/settings" element={<Settings />} />
               <Route path="/user-dashboard" element={
                 <ProtectedRoute>
                   <UserDashboard />
@@ -48,9 +55,12 @@ const App = () => (
                   <SimpleAdminDashboardNew />
                 </ProtectedRoute>
               } />
+              <Route path="/add-project" element={
+                <ProtectedRoute>
+                  <AddProject />
+                </ProtectedRoute>
+              } />
             </Route>
-            <Route path="/projects" element={<Projects />} />
-            <Route path="/projects/:projectId" element={<ProjectDetail />} />
             <Route path="/purchase/:projectId" element={<Purchase />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
@@ -59,6 +69,8 @@ const App = () => (
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </div>
+          <Particles className="fixed inset-0 z-40 pointer-events-none" />
         </TooltipProvider>
       </AuthProvider>
     </ThemeProvider>

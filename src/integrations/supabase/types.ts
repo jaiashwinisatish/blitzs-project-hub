@@ -150,9 +150,9 @@ export type Database = {
         Row: {
           category: Database["public"]["Enums"]["project_category"]
           created_at: string
-          demo_url: string | null
+          demo_link: string | null
+          description: string | null
           features: string[] | null
-          full_description: string | null
           github_repo_url: string | null
           id: string
           images: string[] | null
@@ -170,9 +170,9 @@ export type Database = {
         Insert: {
           category?: Database["public"]["Enums"]["project_category"]
           created_at?: string
-          demo_url?: string | null
+          demo_link?: string | null
+          description?: string | null
           features?: string[] | null
-          full_description?: string | null
           github_repo_url?: string | null
           id?: string
           images?: string[] | null
@@ -190,9 +190,9 @@ export type Database = {
         Update: {
           category?: Database["public"]["Enums"]["project_category"]
           created_at?: string
-          demo_url?: string | null
+          demo_link?: string | null
+          description?: string | null
           features?: string[] | null
-          full_description?: string | null
           github_repo_url?: string | null
           id?: string
           images?: string[] | null

@@ -1,10 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { projectService } from '@/services/project.service';
-import { adminService } from '@/services/admin.service';
+import {
+  useProjects,
+  useCreateProject,
+  useUpdateProject,
+  useDeleteProject
+} from '@/hooks/useProjects';
+import {
+  useDevelopers,
+  useAddDeveloper,
+  useUpdateDeveloper,
+  useDeleteDeveloper,
+  useDashboardStats
+} from '@/hooks/useAdmin';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import {
   Plus,
@@ -42,9 +55,20 @@ interface Project {
 
 const AdminDashboard = () => {
   const { user, signOut } = useAuth();
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [developers, setDevelopers] = useState([]);
-  const [loading, setLoading] = useState(true);
+
+  // Use hooks instead of direct service calls
+  const { data: projects = [], isLoading: projectsLoading } = useProjects({ limit: 100 });
+  const { data: developers = [], isLoading: developersLoading } = useDevelopers();
+  const { data: dashboardStats } = useDashboardStats();
+
+  // Mutations
+  const createProjectMutation = useCreateProject();
+  const updateProjectMutation = useUpdateProject();
+  const deleteProjectMutation = useDeleteProject();
+  const addDeveloperMutation = useAddDeveloper();
+  const updateDeveloperMutation = useUpdateDeveloper();
+  const deleteDeveloperMutation = useDeleteDeveloper();
+
   const [showAddForm, setShowAddForm] = useState(false);
   const [showAddDeveloperForm, setShowAddDeveloperForm] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -70,43 +94,11 @@ const AdminDashboard = () => {
     portfolio: ''
   });
 
-  useEffect(() => {
-    fetchProjects();
-    fetchDevelopers();
-  }, []);
-
-  const fetchDevelopers = async () => {
-    try {
-      const response = await adminService.getAllDevelopers();
-      if (response.success) {
-        setDevelopers(response.data.developers || []);
-      }
-    } catch (error) {
-      console.error('Error fetching developers:', error);
-      toast.error('Failed to fetch developers');
-    }
-  };
-
-  const fetchProjects = async () => {
-    try {
-      const response = await projectService.getAllProjects({ limit: 100 });
-      
-      if (response.success) {
-        setProjects(response.data.projects || []);
-      } else {
-        toast.error('Failed to fetch projects');
-      }
-    } catch (error) {
-      console.error('Error fetching projects:', error);
-      toast.error('Failed to fetch projects');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Remove old useEffect and fetch functions - now using hooks
 
   const handleAddProject = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       const projectData = {
         title: formData.title,
@@ -127,31 +119,29 @@ const AdminDashboard = () => {
 
       let response;
       if (editingProject) {
-        response = await projectService.updateProject(editingProject._id, projectData);
-      } else {
-        response = await projectService.createProject(projectData);
-      }
-      
-      if (response.success) {
-        toast.success(editingProject ? 'Project updated successfully!' : 'Project added successfully!');
-        setShowAddForm(false);
-        setEditingProject(null);
-        setFormData({
-          title: '',
-          description: '',
-          category: 'web',
-          price: 0,
-          github: '',
-          demo: '',
-          featured: false
+        await updateProjectMutation.mutateAsync({
+          projectId: editingProject.id,
+          updateData: projectData
         });
-        fetchProjects();
       } else {
-        toast.error(response.message || 'Failed to save project');
+        await createProjectMutation.mutateAsync(projectData);
       }
+
+      toast.success(editingProject ? 'Project updated successfully!' : 'Project added successfully!');
+      setShowAddForm(false);
+      setEditingProject(null);
+      setFormData({
+        title: '',
+        description: '',
+        category: 'web',
+        price: 0,
+        github: '',
+        demo: '',
+        featured: false
+      });
     } catch (error: any) {
       console.error('Error saving project:', error);
-      toast.error(error.response?.data?.message || 'Failed to save project');
+      toast.error('Failed to save project');
     }
   };
 
@@ -171,19 +161,13 @@ const AdminDashboard = () => {
 
   const handleDeleteProject = async (projectId: string) => {
     if (!confirm('Are you sure you want to delete this project?')) return;
-    
+
     try {
-      const response = await projectService.deleteProject(projectId);
-      
-      if (response.success) {
-        toast.success('Project deleted successfully!');
-        fetchProjects();
-      } else {
-        toast.error(response.message || 'Failed to delete project');
-      }
+      await deleteProjectMutation.mutateAsync(projectId);
+      toast.success('Project deleted successfully!');
     } catch (error: any) {
       console.error('Error deleting project:', error);
-      toast.error(error.response?.data?.message || 'Failed to delete project');
+      toast.error('Failed to delete project');
     }
   };
 
@@ -197,35 +181,32 @@ const AdminDashboard = () => {
         isActive: true
       };
 
-      let response;
       if (editingDeveloper) {
-        response = await adminService.updateDeveloper(editingDeveloper._id, developerData);
-      } else {
-        response = await adminService.addDeveloper(developerData);
-      }
-      
-      if (response.success) {
-        toast.success(editingDeveloper ? 'Developer updated successfully!' : 'Developer added successfully!');
-        setShowAddDeveloperForm(false);
-        setEditingDeveloper(null);
-        setDeveloperFormData({
-          name: '',
-          email: '',
-          bio: '',
-          avatar: '',
-          skills: '',
-          experience: 'intermediate',
-          github: '',
-          linkedin: '',
-          portfolio: ''
+        await updateDeveloperMutation.mutateAsync({
+          developerId: editingDeveloper.id,
+          updateData: developerData
         });
-        fetchDevelopers();
       } else {
-        toast.error(response.message || 'Failed to save developer');
+        await addDeveloperMutation.mutateAsync(developerData);
       }
+
+      toast.success(editingDeveloper ? 'Developer updated successfully!' : 'Developer added successfully!');
+      setShowAddDeveloperForm(false);
+      setEditingDeveloper(null);
+      setDeveloperFormData({
+        name: '',
+        email: '',
+        bio: '',
+        avatar: '',
+        skills: '',
+        experience: 'intermediate',
+        github: '',
+        linkedin: '',
+        portfolio: ''
+      });
     } catch (error: any) {
       console.error('Error saving developer:', error);
-      toast.error(error.response?.data?.message || 'Failed to save developer');
+      toast.error('Failed to save developer');
     }
   };
 
@@ -247,23 +228,77 @@ const AdminDashboard = () => {
 
   const handleDeleteDeveloper = async (developerId: string) => {
     if (!confirm('Are you sure you want to delete this developer?')) return;
-    
+
     try {
-      // Note: You'll need to implement deleteDeveloper in admin.service
+      await deleteDeveloperMutation.mutateAsync(developerId);
       toast.success('Developer deleted successfully!');
-      fetchDevelopers();
     } catch (error: any) {
       console.error('Error deleting developer:', error);
-      toast.error(error.response?.data?.message || 'Failed to delete developer');
+      toast.error('Failed to delete developer');
     }
   };
 
-  if (loading) {
+  if (projectsLoading || developersLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading admin dashboard...</p>
+      <div className="min-h-screen bg-background py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header Skeleton */}
+          <div className="mb-8 flex justify-between items-center">
+            <div>
+              <Skeleton className="h-8 w-48 mb-2" />
+              <Skeleton className="h-5 w-64" />
+            </div>
+            <Skeleton className="h-10 w-24" />
+          </div>
+
+          {/* Stats Cards Skeleton */}
+          <div className="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <Card key={i}>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <Skeleton className="h-4 w-28" />
+                  <Skeleton className="h-4 w-4" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-8 w-16" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Tabs Skeleton */}
+          <div className="space-y-6">
+            <Skeleton className="h-10 w-full grid-cols-4" />
+
+            <Card>
+              <CardHeader>
+                <Skeleton className="h-6 w-40 mb-2" />
+                <Skeleton className="h-4 w-64" />
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="border rounded-lg p-4">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <Skeleton className="h-5 w-48 mb-1" />
+                          <Skeleton className="h-4 w-64 mb-2" />
+                          <div className="flex gap-2 mt-2">
+                            <Skeleton className="h-6 w-20" />
+                            <Skeleton className="h-6 w-16" />
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Skeleton className="h-8 w-8" />
+                          <Skeleton className="h-8 w-8" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     );
@@ -292,8 +327,38 @@ const AdminDashboard = () => {
               <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{projects.length}</div>
+              <div className="text-2xl font-bold">{dashboardStats?.totalProjects || projects.length}</div>
               <p className="text-xs text-muted-foreground">Projects in database</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Developers</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{dashboardStats?.totalDevelopers || developers.length}</div>
+              <p className="text-xs text-muted-foreground">Team members</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+              <UserPlus className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{dashboardStats?.totalUsers || 0}</div>
+              <p className="text-xs text-muted-foreground">Registered users</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+              <Package className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">${dashboardStats?.totalRevenue || 0}</div>
+              <p className="text-xs text-muted-foreground">From project sales</p>
             </CardContent>
           </Card>
         </div>
@@ -551,7 +616,7 @@ const AdminDashboard = () => {
               </div>
               <div className="space-y-4">
                 {projects.map((project: any, index) => (
-                  <div key={project._id} className="border rounded-lg p-4">
+                  <div key={project.id} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="font-semibold">{project.title}</h3>
@@ -567,7 +632,7 @@ const AdminDashboard = () => {
                         <Button size="sm" variant="outline" onClick={() => handleEditProject(project)}>
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button size="sm" variant="outline" onClick={() => handleDeleteProject(project._id)}>
+                        <Button size="sm" variant="outline" onClick={() => handleDeleteProject(project.id)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -611,7 +676,7 @@ const AdminDashboard = () => {
               </div>
               <div className="space-y-4">
                 {developers.map((developer: any, index) => (
-                  <div key={developer._id} className="border rounded-lg p-4">
+                  <div key={developer.id} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="font-semibold">{developer.name}</h3>
@@ -630,7 +695,7 @@ const AdminDashboard = () => {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleDeleteProject(project._id)}
+                            onClick={() => handleDeleteProject(project.id)}
                             className="text-red-600 hover:text-red-800"
                           >
                             <Trash2 className="h-4 w-4" />

@@ -4,16 +4,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { adminService } from '../services/admin.service';
-import { projectService } from '../services/project.service';
-import { clientService } from '../services/client.service';
+import {
+  useDevelopers,
+  useDashboardStats,
+  useUsers,
+  useAdminProjects,
+  useClientRequests
+} from '../hooks/useAdmin';
 import { useAuth } from '@/contexts/AuthContext';
-import { 
-  Users, 
-  FolderOpen, 
-  ShoppingCart, 
-  MessageSquare, 
-  TrendingUp, 
+import {
+  Users,
+  FolderOpen,
+  ShoppingCart,
+  MessageSquare,
+  TrendingUp,
   DollarSign,
   Eye,
   Edit,
@@ -22,62 +26,19 @@ import {
   Phone,
   Calendar
 } from 'lucide-react';
-import { toast } from 'sonner';
-
-const SimpleAdminDashboardNew = () => {
+import { toast } from 'sonner';const SimpleAdminDashboardNew = () => {
   const { user } = useAuth();
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    totalProjects: 0,
-    totalOrders: 0,
-    totalRequests: 0,
-    totalRevenue: 0
-  });
-  const [loading, setLoading] = useState(true);
+
+  // Use hooks instead of direct service calls
+  const { data: developers = [] } = useDevelopers();
+  const { data: dashboardStats } = useDashboardStats();
+  const { data: usersData } = useUsers({ limit: 10 });
+  const { data: projects = [] } = useAdminProjects({ limit: 10 });
+  const { data: clientRequests = [] } = useClientRequests({ limit: 10 });
+
   const [activeTab, setActiveTab] = useState('overview');
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      
-      // Fetch developers count
-      const developersResponse = await adminService.getAllDevelopers();
-      const developersCount = developersResponse.success ? developersResponse.data.developers.length : 0;
-
-      // Fetch projects count
-      const projectsResponse = await projectService.getAllProjects({ limit: 1000 });
-      const projectsCount = projectsResponse.success ? projectsResponse.data.projects.length : 0;
-
-      // Fetch client requests count
-      const requestsResponse = await clientService.getClientRequests();
-      const requestsCount = requestsResponse.success ? requestsResponse.data.length : 0;
-
-      setStats({
-        totalUsers: developersCount,
-        totalProjects: projectsCount,
-        totalOrders: 0, // Would need order service integration
-        totalRequests: requestsCount,
-        totalRevenue: 0 // Would need order service integration
-      });
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      toast.error('Failed to load dashboard data');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
+  // Remove old fetchDashboardData function - now using hooks
 
   return (
     <div className="min-h-screen bg-background">
@@ -117,7 +78,7 @@ const SimpleAdminDashboardNew = () => {
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalUsers}</div>
+                  <div className="text-2xl font-bold">{dashboardStats?.totalUsers || developers.length}</div>
                   <p className="text-xs text-muted-foreground">Active team members</p>
                 </CardContent>
               </Card>
@@ -128,7 +89,7 @@ const SimpleAdminDashboardNew = () => {
                   <FolderOpen className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalProjects}</div>
+                  <div className="text-2xl font-bold">{dashboardStats?.totalProjects || projects.length}</div>
                   <p className="text-xs text-muted-foreground">Published projects</p>
                 </CardContent>
               </Card>
@@ -139,7 +100,7 @@ const SimpleAdminDashboardNew = () => {
                   <MessageSquare className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalRequests}</div>
+                  <div className="text-2xl font-bold">{clientRequests.length}</div>
                   <p className="text-xs text-muted-foreground">Pending requests</p>
                 </CardContent>
               </Card>
@@ -150,7 +111,7 @@ const SimpleAdminDashboardNew = () => {
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">${stats.totalRevenue}</div>
+                  <div className="text-2xl font-bold">${dashboardStats?.totalRevenue || 0}</div>
                   <p className="text-xs text-muted-foreground">Total earnings</p>
                 </CardContent>
               </Card>
@@ -243,7 +204,7 @@ const SimpleAdminDashboardNew = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-medium">Recent Requests</h3>
-                    <Badge variant="secondary">{stats.totalRequests} pending</Badge>
+                    <Badge variant="secondary">{clientRequests.length} pending</Badge>
                   </div>
                   <div className="text-sm text-muted-foreground">
                     Client request management interface would be implemented here

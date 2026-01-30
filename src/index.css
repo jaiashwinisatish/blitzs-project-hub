@@ -1,128 +1,88 @@
-<<<<<<< HEAD
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap');
-
-=======
->>>>>>> cec1ed9e7a814c3cdfc944f5b35d7550ec727e68
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Blitzs Design System - Blue/Cyan Theme with Dark/Light Mode */
+/* Blitzs Design System - Minimal Professional Theme with Indigo Accent */
 
 @layer base {
   :root {
-    /* Light mode - Clean professional with cyan accents */
-    --background: 210 20% 98%;
-    --foreground: 222 47% 11%;
+    /* Light mode with indigo primary */
+    --background: 0 0% 100%; /* Pure white */
+    --foreground: 222 47% 11%; /* Dark gray */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card: 0 0% 100%; /* White */
+    --card-foreground: 222 47% 11%; /* Dark gray */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover: 0 0% 100%; /* White */
+    --popover-foreground: 222 47% 11%; /* Dark gray */
 
-    /* Primary: Cyan/Blue gradient base */
-    --primary: 199 89% 48%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 221 83% 53%; /* Indigo */
+    --primary-foreground: 0 0% 100%; /* White */
 
-    --secondary: 210 40% 96%;
+    --secondary: 210 40% 96%; /* Light gray blue */
     --secondary-foreground: 222 47% 11%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 210 40% 96%; /* Light gray blue */
+    --muted-foreground: 215 16% 47%; /* Muted gray */
 
-    --accent: 186 94% 41%;
+    --accent: 221 83% 53%; /* Indigo (same as primary) */
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 84% 60%; /* Red */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 199 89% 48%;
+    --border: 214 32% 91%; /* Light gray */
+    --input: 214 32% 91%; /* Light gray */
+    --ring: 221 83% 53%; /* Indigo */
 
-    --radius: 0.75rem;
-
-    /* Blitzs brand colors */
-    --blitz-cyan: 186 94% 41%;
-    --blitz-blue: 199 89% 48%;
-    --blitz-dark: 222 47% 11%;
-    --blitz-gradient-start: 199 89% 48%;
-    --blitz-gradient-end: 186 94% 41%;
-
-    /* Success/Warning/Info */
-    --success: 142 76% 36%;
+    --radius: 0.5rem; /* 8px radius */
+    
+    /* Semantic colors */
+    --success: 142 76% 36%; /* Emerald */
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
+    --warning: 42 92% 50%; /* Amber */
     --warning-foreground: 0 0% 100%;
-    --info: 199 89% 48%;
+    --info: 200 98% 39%; /* Blue */
     --info-foreground: 0 0% 100%;
-
-    /* Sidebar */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 222 47% 11%;
-    --sidebar-primary: 199 89% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 40% 96%;
-    --sidebar-accent-foreground: 222 47% 11%;
-    --sidebar-border: 214 32% 91%;
-    --sidebar-ring: 199 89% 48%;
   }
 
   .dark {
-    /* Dark mode - GreatStack inspired dark theme */
-    --background: 222 47% 6%;
-    --foreground: 210 40% 98%;
+    /* Dark mode with custom background and silver text */
+    --background: 0 0% 5%; /* #0C0C0C - Very dark gray */
+    --foreground: 0 0% 75%; /* Silver text */
 
-    --card: 222 47% 9%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 8%; /* Slightly lighter than background */
+    --card-foreground: 0 0% 75%;
 
-    --popover: 222 47% 9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 75%;
 
-    --primary: 186 94% 50%;
-    --primary-foreground: 222 47% 6%;
+    --primary: 217 91% 60%; /* Keep indigo primary */
+    --primary-foreground: 0 0% 5%;
 
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 0 0% 12%; /* Dark gray */
+    --secondary-foreground: 0 0% 75%;
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 60%; /* Muted silver */
 
-    --accent: 199 89% 55%;
-    --accent-foreground: 222 47% 6%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 5%;
 
     --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 75%;
 
-    --border: 217 33% 17%;
-    --input: 217 33% 20%;
-    --ring: 186 94% 50%;
-
-    /* Blitzs brand colors - slightly adjusted for dark mode */
-    --blitz-cyan: 186 94% 50%;
-    --blitz-blue: 199 89% 55%;
-    --blitz-dark: 222 47% 6%;
-    --blitz-gradient-start: 199 89% 55%;
-    --blitz-gradient-end: 186 94% 50%;
-
-    /* Success/Warning/Info for dark mode */
+    --border: 0 0% 15%;
+    --input: 0 0% 10%;
+    --ring: 217 91% 60%;
+    
+    /* Semantic colors for dark mode */
     --success: 142 76% 46%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 55%;
+    --warning: 42 92% 55%;
     --warning-foreground: 0 0% 100%;
-    --info: 199 89% 55%;
+    --info: 200 98% 49%;
     --info-foreground: 0 0% 100%;
-
-    /* Sidebar */
-    --sidebar-background: 222 47% 8%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 186 94% 50%;
-    --sidebar-primary-foreground: 222 47% 6%;
-    --sidebar-accent: 217 33% 14%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217 33% 17%;
-    --sidebar-ring: 186 94% 50%;
   }
 }
 
@@ -156,70 +116,67 @@
   }
 }
 
+/* Typography scale */
+@layer base {
+  h1 {
+    @apply text-4xl md:text-5xl font-bold leading-tight;
+  }
+
+  h2 {
+    @apply text-2xl md:text-3xl font-semibold leading-relaxed;
+  }
+
+  h3 {
+    @apply text-xl md:text-2xl font-medium leading-relaxed;
+  }
+
+  body {
+    @apply text-base leading-normal;
+  }
+
+  small {
+    @apply text-sm;
+  }
+}
+
+/* Spacing utilities - 8px system */
 @layer utilities {
-  /* Blitzs gradient utilities */
-  .bg-blitz-gradient {
-    background: linear-gradient(135deg, hsl(var(--blitz-blue)) 0%, hsl(var(--blitz-cyan)) 100%);
+  .spacing-system {
+    /* All spacing follows 8px increments */
   }
 
-  .text-blitz-gradient {
-    background: linear-gradient(135deg, hsl(var(--blitz-blue)) 0%, hsl(var(--blitz-cyan)) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .gap-1 { gap: 0.25rem; } /* 4px */
+  .gap-2 { gap: 0.5rem; } /* 8px */
+  .gap-3 { gap: 0.75rem; } /* 12px */
+  .gap-4 { gap: 1rem; } /* 16px */
+  .gap-6 { gap: 1.5rem; } /* 24px */
+  .gap-8 { gap: 2rem; } /* 32px */
+  .gap-12 { gap: 3rem; } /* 48px */
+  .gap-16 { gap: 4rem; } /* 64px */
+}
+
+/* Simple CSS animations */
+@layer utilities {
+  .transition-standard {
+    @apply transition-all duration-200 ease-out;
   }
 
-  .border-blitz-gradient {
-    border-image: linear-gradient(135deg, hsl(var(--blitz-blue)) 0%, hsl(var(--blitz-cyan)) 100%) 1;
+  .hover-lift {
+    @apply transition-transform duration-200 ease-out hover:translate-y-[-2px];
   }
 
-  /* Glass effect for cards */
-  .glass {
-    background: hsl(var(--card) / 0.8);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+  .fade-in {
+    @apply animate-fade-in duration-300 ease-out;
   }
+}
 
-  .glass-dark {
-    background: hsl(var(--card) / 0.6);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-
-  /* Glow effects */
-  .glow-cyan {
-    box-shadow: 0 0 20px hsl(var(--blitz-cyan) / 0.3),
-                0 0 40px hsl(var(--blitz-cyan) / 0.2),
-                0 0 60px hsl(var(--blitz-cyan) / 0.1);
-  }
-
-  .glow-blue {
-    box-shadow: 0 0 20px hsl(var(--blitz-blue) / 0.3),
-                0 0 40px hsl(var(--blitz-blue) / 0.2);
-  }
-
-  /* Animation utilities */
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
-  }
-
-  .animate-pulse-slow {
-    animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
-  .animate-gradient {
-    background-size: 200% 200%;
-    animation: gradient 8s ease infinite;
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
-  }
-
-  @keyframes gradient {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

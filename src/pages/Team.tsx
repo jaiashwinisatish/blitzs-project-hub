@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,85 +6,70 @@ import { Button } from '@/components/ui/button';
 import { Github, Linkedin, Mail, ExternalLink, Edit, Trash2, UserPlus, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
-import { adminService } from '../services/admin.service';
+import {
+  useDevelopers,
+  useAddDeveloper,
+  useUpdateDeveloper,
+  useDeleteDeveloper
+} from '../hooks/useAdmin';
 
 const Team = () => {
   const { user } = useAuth();
-  const [developers, setDevelopers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: developers = [], isLoading: loading } = useDevelopers();
+  const addDeveloperMutation = useAddDeveloper();
+  const updateDeveloperMutation = useUpdateDeveloper();
+  const deleteDeveloperMutation = useDeleteDeveloper();
+
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingDeveloper, setEditingDeveloper] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
+    role: '',
     bio: '',
-    avatar: '',
+    avatar_url: '',
     skills: '',
-    experience: 'intermediate',
-    github: '',
-    linkedin: '',
-    portfolio: ''
+    github_url: '',
+    linkedin_url: ''
   });
-
-  useEffect(() => {
-    fetchDevelopers();
-  }, []);
-
-  const fetchDevelopers = async () => {
-    try {
-      setLoading(true);
-      const response = await adminService.getAllDevelopers();
-      
-      if (response.success) {
-        setDevelopers(response.data.developers || []);
-      }
-    } catch (error) {
-      console.error('Error fetching developers:', error);
-      toast.error('Failed to load developers');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleAddDeveloper = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       const developerData = {
         ...formData,
-        skills: formData.skills.split(',').map(s => s.trim()).filter(s => s),
-        is_active: true
+        skills: formData.skills.split(',').map(s => s.trim()).filter(s => s)
       };
 
-      let response;
+      let result;
       if (editingDeveloper) {
-        response = await adminService.updateDeveloper(editingDeveloper.id, developerData);
+        result = await updateDeveloperMutation.mutateAsync({
+          developerId: editingDeveloper.id,
+          updateData: developerData
+        });
       } else {
-        response = await adminService.addDeveloper(developerData);
+        result = await addDeveloperMutation.mutateAsync(developerData);
       }
-      
-      if (response.success) {
+
+      if (result.success) {
         toast.success(editingDeveloper ? 'Developer updated successfully!' : 'Developer added successfully!');
         setShowAddForm(false);
         setEditingDeveloper(null);
         setFormData({
           name: '',
-          email: '',
+          role: '',
           bio: '',
-          avatar: '',
+          avatar_url: '',
           skills: '',
-          experience: 'intermediate',
-          github: '',
-          linkedin: '',
-          portfolio: ''
+          github_url: '',
+          linkedin_url: ''
         });
-        fetchDevelopers();
       } else {
-        toast.error(response.message || 'Failed to save developer');
+        toast.error(result.message || 'Failed to save developer');
       }
     } catch (error: any) {
       console.error('Error saving developer:', error);
-      toast.error(error.response?.data?.message || 'Failed to save developer');
+      toast.error(error.message || 'Failed to save developer');
     }
   };
 
@@ -119,8 +104,51 @@ const Team = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      <div className="min-h-screen bg-background">
+        {/* Header Skeleton */}
+        <section className="py-20 bg-gradient-to-br from-primary/10 to-secondary/10">
+          <div className="container mx-auto px-4">
+            <div className="text-center max-w-4xl mx-auto">
+              <Skeleton className="h-12 w-64 mx-auto mb-6" />
+              <Skeleton className="h-6 w-96 mx-auto mb-8" />
+              <Skeleton className="h-10 w-40 mx-auto" />
+            </div>
+          </div>
+        </section>
+
+        {/* Team Grid Skeleton */}
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {[...Array(6)].map((_, index) => (
+                <Card key={index} className="h-full">
+                  <CardContent className="p-6">
+                    <div className="flex items-center space-x-4 mb-4">
+                      <Skeleton className="w-16 h-16 rounded-full" />
+                      <div className="flex-1">
+                        <Skeleton className="h-6 w-32 mb-1" />
+                        <Skeleton className="h-4 w-24" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-4 w-3/4 mb-4" />
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      <Skeleton className="h-6 w-16" />
+                      <Skeleton className="h-6 w-20" />
+                      <Skeleton className="h-6 w-14" />
+                    </div>
+                    <div className="flex gap-2">
+                      <Skeleton className="h-8 w-8" />
+                      <Skeleton className="h-8 w-8" />
+                      <Skeleton className="h-8 w-8" />
+                      <Skeleton className="h-8 w-8" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
       </div>
     );
   }

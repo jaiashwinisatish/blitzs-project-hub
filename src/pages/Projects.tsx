@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { projectService } from '../services/project.service';
 import { useAuth } from '@/contexts/AuthContext';
@@ -8,8 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-import { Search, Filter, ShoppingCart, ExternalLink, Star, Download, Eye } from 'lucide-react';
+import { Search, Filter, ShoppingCart, ExternalLink, Star, Download, Eye, Upload, ChevronRight } from 'lucide-react';
 
 const Projects = () => {
   const { user } = useAuth();
@@ -46,8 +47,12 @@ const Projects = () => {
 
       const response = await projectService.getAllProjects(params);
       if (response.success) {
-        setProjects(response.data.projects);
-        setPagination(response.data.pagination);
+        setProjects(response.data);
+        setPagination({
+          currentPage: response.pagination.page,
+          totalPages: response.pagination.totalPages,
+          totalProjects: response.pagination.total
+        });
       }
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -87,14 +92,102 @@ const Projects = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      <div className="min-h-screen bg-background">
+        {/* Breadcrumb Navigation Skeleton */}
+        <section className="py-4 border-b bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center space-x-2">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-4" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+          </div>
+        </section>
+
+        {/* Header Skeleton */}
+        <section className="py-20 bg-gradient-to-br from-primary/10 to-secondary/10">
+          <div className="container mx-auto px-4 text-center">
+            <Skeleton className="h-10 w-64 mx-auto mb-4" />
+            <Skeleton className="h-6 w-96 mx-auto" />
+          </div>
+        </section>
+
+        {/* Filters Skeleton */}
+        <section className="py-8 border-b">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+              <div className="flex flex-col sm:flex-row gap-4 flex-1">
+                <Skeleton className="h-10 w-full max-w-md" />
+                <Skeleton className="h-10 w-48" />
+                <Skeleton className="h-10 w-48" />
+                <Skeleton className="h-10 w-32" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Projects Grid Skeleton */}
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, index) => (
+                <Card key={index} className="h-full flex flex-col">
+                  <CardHeader className="pb-3">
+                    <Skeleton className="aspect-video w-full rounded-lg mb-4" />
+                    <div className="flex items-start justify-between">
+                      <Skeleton className="h-6 w-3/4" />
+                      <Skeleton className="h-5 w-12" />
+                    </div>
+                    <Skeleton className="h-4 w-full mt-2" />
+                    <Skeleton className="h-4 w-2/3 mt-1" />
+                  </CardHeader>
+                  <CardContent className="flex-1">
+                    <div className="flex flex-wrap gap-1 mb-4">
+                      <Skeleton className="h-5 w-16" />
+                      <Skeleton className="h-5 w-20" />
+                      <Skeleton className="h-5 w-14" />
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <Skeleton className="h-4 w-16" />
+                      <Skeleton className="h-4 w-16" />
+                    </div>
+                  </CardContent>
+                  <CardFooter className="pt-3">
+                    <div className="flex items-center justify-between w-full">
+                      <div>
+                        <Skeleton className="h-8 w-16 mb-1" />
+                        <Skeleton className="h-5 w-20" />
+                      </div>
+                      <div className="flex gap-2">
+                        <Skeleton className="h-8 w-8" />
+                        <Skeleton className="h-8 w-20" />
+                      </div>
+                    </div>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Breadcrumb Navigation */}
+      <section className="py-4 border-b bg-muted/30">
+        <div className="container mx-auto px-4">
+          <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
+            <Link to="/" className="hover:text-foreground transition-colors">
+              Home
+            </Link>
+            <ChevronRight className="h-4 w-4" />
+            <span className="text-foreground font-medium">Projects</span>
+          </nav>
+        </div>
+      </section>
+
       {/* Header */}
       <section className="py-20 bg-gradient-to-br from-primary/10 to-secondary/10">
         <div className="container mx-auto px-4 text-center">
@@ -112,6 +205,20 @@ const Projects = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* Add Project Button */}
+      {user && (
+        <section className="py-4 bg-muted/50">
+          <div className="container mx-auto px-4">
+            <div className="flex justify-end">
+              <Button onClick={() => navigate('/add-project')}>
+                <Upload className="h-4 w-4 mr-2" />
+                Add Your Project
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Filters */}
       <section className="py-8 border-b">

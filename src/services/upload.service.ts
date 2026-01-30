@@ -1,42 +1,36 @@
-// Simple file upload service
-// For now, we'll use a placeholder service that returns a URL
-// In production, you would integrate with Cloudinary, AWS S3, or similar
+import { supabase } from '@/lib/supabase';
 
-export const uploadImage = async (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    // For demo purposes, we'll use a placeholder URL
-    // In production, you would upload to Cloudinary or similar service
-    
-    // Simulate upload delay
-    setTimeout(() => {
-      // Generate a unique placeholder URL based on file name
-      const placeholderUrl = `https://images.unsplash.com/photo-${Date.now()}?w=400&h=400&fit=crop&crop=face`;
-      resolve(placeholderUrl);
-    }, 1000);
-    
-    // TODO: Implement real upload service
-    /*
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'developer_avatars');
-    
-    try {
-      const response = await fetch('https://api.cloudinary.com/v1_1/your_cloud_name/image/upload', {
-        method: 'POST',
-        body: formData
-      });
-      
-      if (!response.ok) {
-        throw new Error('Upload failed');
-      }
-      
-      const data = await response.json();
-      resolve(data.secure_url);
-    } catch (error) {
-      reject(error);
-    }
-    */
+// Upload an image to Supabase Storage (bucket: 'avatars') and return the public URL
+export const uploadImage = async (file: File, userId?: string): Promise<{ publicUrl: string; path: string }> => {
+  // Construct a safe path
+  const uid = userId || 'anonymous';
+  const safeName = file.name.replace(/\s+/g, '_');
+  const path = `${uid}/${Date.now()}_${safeName}`;
+
+  // Upload to 'avatars' bucket. Ensure the bucket exists and is public or generate signed URLs if private
+  const { data, error } = await supabase.storage.from('avatars').upload(path, file, {
+    cacheControl: '3600',
+    upsert: false,
   });
+
+  if (error) {
+    throw error;
+  }
+
+  // Get public URL
+  const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path);
+  return { publicUrl: urlData.publicUrl, path };
+};
+
+export const removeImage = async (path: string) => {
+  if (!path) return;
+  try {
+    const { error } = await supabase.storage.from('avatars').remove([path]);
+    if (error) throw error;
+  } catch (err) {
+    // Log but don't throw - cleanup is best-effort
+    console.warn('Failed to remove image:', err);
+  }
 };
 
 export const validateImageFile = (file: File): string | null => {

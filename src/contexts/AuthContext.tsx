@@ -13,6 +13,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAdmin: boolean;
+  refreshUser: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -75,6 +76,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
+  const refreshUser = async () => {
+    setIsLoading(true);
+    try {
+      const { data: { user: sessionUser } } = await supabase.auth.getUser();
+      if (sessionUser) {
+        const userData: User = {
+          id: sessionUser.id,
+          email: sessionUser.email!,
+          full_name: sessionUser.user_metadata?.full_name,
+          role: sessionUser.user_metadata?.role || 'user',
+          avatar: sessionUser.user_metadata?.avatar
+        };
+        setUser(userData);
+      } else {
+        setUser(null);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const signIn = async (email: string, password: string) => {
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -113,6 +135,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     isLoading,
     isAdmin,
+    refreshUser,
     signIn,
     signUp,
     signOut,

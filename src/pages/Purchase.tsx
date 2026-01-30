@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { ArrowLeft, ShoppingCart, Download, ExternalLink, Star, Check, CreditCard, Shield, Truck } from 'lucide-react';
 
@@ -72,8 +73,89 @@ const Purchase = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      <div className="min-h-screen bg-background">
+        {/* Header Skeleton */}
+        <section className="py-12 bg-gradient-to-br from-primary/10 to-secondary/10">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center gap-4 mb-6">
+              <Skeleton className="h-9 w-28" />
+            </div>
+            <div className="max-w-6xl mx-auto">
+              <Skeleton className="h-10 w-64 mb-4" />
+              <Skeleton className="h-6 w-96" />
+            </div>
+          </div>
+        </section>
+
+        {/* Purchase Content Skeleton */}
+        <section className="py-12">
+          <div className="container mx-auto px-4">
+            <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {/* Project Details Skeleton */}
+              <div className="lg:col-span-2">
+                <Card>
+                  <CardHeader>
+                    <Skeleton className="aspect-video w-full rounded-lg mb-4" />
+                    <Skeleton className="h-8 w-3/4 mb-2" />
+                    <Skeleton className="h-5 w-full" />
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div>
+                      <Skeleton className="h-5 w-32 mb-2" />
+                      <Skeleton className="h-4 w-full mb-2" />
+                      <Skeleton className="h-4 w-3/4" />
+                    </div>
+                    <div>
+                      <Skeleton className="h-5 w-24 mb-3" />
+                      <div className="grid md:grid-cols-2 gap-2">
+                        {[...Array(4)].map((_, i) => (
+                          <div key={i} className="flex items-center gap-2">
+                            <Skeleton className="h-4 w-4 rounded-full" />
+                            <Skeleton className="h-4 w-40" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <Skeleton className="h-5 w-36 mb-3" />
+                      <div className="flex flex-wrap gap-2">
+                        <Skeleton className="h-6 w-20" />
+                        <Skeleton className="h-6 w-24" />
+                        <Skeleton className="h-6 w-16" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Purchase Summary Skeleton */}
+              <div>
+                <Card className="sticky top-4">
+                  <CardHeader>
+                    <Skeleton className="h-6 w-40" />
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <Skeleton className="h-6 w-28" />
+                      <Skeleton className="h-8 w-20" />
+                    </div>
+                    <div className="border-t pt-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <Skeleton className="h-6 w-16" />
+                        <Skeleton className="h-8 w-20" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-12 w-full" />
+                    <div className="flex items-center justify-between text-sm pt-4 border-t">
+                      <Skeleton className="h-4 w-20" />
+                      <Skeleton className="h-4 w-24" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     );
   }
