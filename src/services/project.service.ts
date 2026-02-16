@@ -191,10 +191,16 @@ export const projectService = {
       if (orderError) throw orderError;
 
       // Update project purchase count
+      const { data: currentProject } = await supabase
+        .from('projects')
+        .select('purchases')
+        .eq('id', projectId)
+        .single();
+
       const { error: updateError } = await supabase
         .from('projects')
         .update({
-          purchases: supabase.raw('purchases + 1'),
+          purchases: (currentProject?.purchases || 0) + 1,
           updated_at: new Date().toISOString()
         })
         .eq('id', projectId);
@@ -223,7 +229,7 @@ export const projectService = {
   },
 
   // Admin-only methods
-  async createProject(projectData: Omit<Project, 'id' | 'created_at' | 'updated_at' | 'downloads' | 'purchases' | 'rating'>) {
+  async createProject(projectData: Omit<Project, 'id' | 'created_at' | 'updated_at' | 'downloads' | 'purchases' | 'rating'> & { demo_url?: string }) {
     try {
       const { data: { user } } = await supabase.auth.getUser();
 
@@ -244,7 +250,7 @@ export const projectService = {
           category: projectData.category,
           price: projectData.price,
           thumbnail_url: projectData.thumbnail_url,
-          demo_link: projectData.demo_url,
+          demo_link: projectData.demo_link,
           github_repo_url: projectData.github_repo_url,
           tech_stack: projectData.tech_stack,
           features: projectData.features,
@@ -351,56 +357,6 @@ export const projectService = {
       return {
         success: false,
         message: error.message || 'Failed to fetch purchases'
-      };
-    }
-  },
-
-  async createProject(projectData: {
-    title: string;
-    short_description: string;
-    description: string;
-    price: number;
-    category: string;
-    images: string[];
-    is_published?: boolean;
-  }) {
-    try {
-      const { data, error } = await supabase
-        .from('projects')
-        .insert([{
-          title: projectData.title,
-          short_description: projectData.short_description,
-          description: projectData.description,
-          slug: projectData.title.toLowerCase().replace(/\s+/g, '-'),
-          price: projectData.price,
-          category: projectData.category,
-          images: projectData.images,
-          tech_stack: [],
-          features: [],
-          thumbnail_url: '',
-          demo_link: '',
-          github_repo_url: '',
-          video_url: '',
-          is_featured: false,
-          is_published: projectData.is_published ?? true,
-          added_by: null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      return {
-        success: true,
-        data
-      };
-    } catch (error: any) {
-      console.error('Error creating project:', error);
-      return {
-        success: false,
-        message: error.message || 'Failed to create project'
       };
     }
   }

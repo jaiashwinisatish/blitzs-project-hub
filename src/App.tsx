@@ -6,8 +6,10 @@ import { Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { MainLayout } from "@/components/layout/MainLayout";
-import Particles from "../components/reactbits/Particles";
-import Index from "./pages/Index";
+import NewLandingPage from "./pages/NewLandingPage";
+import ModernLandingPage from "./pages/ModernLandingPage";
+import NovaStyledLanding from "./pages/NovaStyledLanding";
+import NovaLandingNew from "./pages/NovaLandingNew";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import UserDashboard from "./pages/UserDashboard";
@@ -37,8 +39,8 @@ const App = () => (
             <Toaster />
             <Sonner />
             <Routes>
+              <Route path="/" element={<NewLandingPage />} />
             <Route element={<MainLayout />}>
-              <Route path="/" element={<Index />} />
               <Route path="/team" element={<Team />} />
               <Route path="/how-to-use" element={<Guide />} />
               <Route path="/contact" element={<Contact />} />
@@ -70,7 +72,6 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
           </div>
-          <Particles className="fixed inset-0 z-40 pointer-events-none" />
         </TooltipProvider>
       </AuthProvider>
     </ThemeProvider>
